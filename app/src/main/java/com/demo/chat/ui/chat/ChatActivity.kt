@@ -25,8 +25,15 @@ import kotlinx.coroutines.launch
 
 class ChatActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_THREAD_ID = "extra_thread_id"
+        const val EXTRA_PEER_NAME = "extra_peer_name"
+    }
+
     private lateinit var binding: ActivityChatBinding
     private lateinit var chatAdapter: ChatAdapter
+    private var peerName: String = "Echo Bot"
+    private var threadId: String = "thread_echo_bot"
 
     private val viewModel: ChatViewModel by viewModels {
         val app = application as DemoChatApplication
@@ -38,6 +45,9 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        threadId = intent.getStringExtra(EXTRA_THREAD_ID) ?: "thread_echo_bot"
+        peerName = intent.getStringExtra(EXTRA_PEER_NAME) ?: "Echo Bot"
+
         setupToolbar()
         setupRecyclerView()
         setupInputAndChips()
@@ -47,6 +57,7 @@ class ChatActivity : AppCompatActivity() {
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.tvToolbarTitle.text = peerName
     }
 
     private fun setupRecyclerView() {

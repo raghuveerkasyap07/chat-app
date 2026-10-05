@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/window_background"
+    android:fitsSystemWindows="true"
     tools:context=".ui.chat.ChatActivity">
 
     <!-- AppBar & Toolbar -->
@@ -168,11 +169,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
+            android:gravity="center_vertical|start"
             android:hint="@string/type_a_message"
             android:importantForAutofill="no"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="4"
             android:paddingVertical="8dp"
+            android:scrollbars="vertical"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"
             android:textSize="15sp" />
