@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.DemoChat" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_600</item>
+        <item name="colorPrimaryVariant">@color/primary_700</item>
+        <item name="colorOnPrimary">@color/surface_card</item>
+        <item name="android:statusBarColor">#111827</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">#1F2937</item>
+    </style>
+</resources>

@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Demo Chat</string>
+    <string name="title_chat">Demo Echo Chat</string>
+
+    <!-- Connection status -->
+    <string name="status_connected">Connected</string>
+    <string name="status_connecting">Connecting...</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_reconnecting">Reconnecting...</string>
+
+    <!-- Chat UI -->
+    <string name="type_a_message">Type a message...</string>
+    <string name="send">Send</string>
+    <string name="echo_bot">Echo Bot</string>
+    <string name="you">You</string>
+    <string name="system">System</string>
+
+    <!-- Menu & Dialogs -->
+    <string name="menu_server_settings">Server Config</string>
+    <string name="menu_clear_chat">Clear Chat</string>
+    <string name="menu_reconnect">Reconnect</string>
+    <string name="menu_ping">Send Ping</string>
+
+    <string name="dialog_server_title">WebSocket Server Configuration</string>
+    <string name="dialog_server_hint">WebSocket URL (e.g., wss://ws.postman-echo.com/raw)</string>
+    <string name="btn_connect">Connect</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Suggestions -->
+    <string name="suggestion_hello">👋 Hello!</string>
+    <string name="suggestion_echo">🧪 Test Echo</string>
+    <string name="suggestion_ping">⏱️ Ping</string>
+    <string name="suggestion_how_are_you">❓ How are you?</string>
+
+    <!-- System Messages -->
+    <string name="sys_msg_connected">Connected to WebSocket Echo Server: %1$s</string>
+    <string name="sys_msg_disconnected">Disconnected from WebSocket Server</string>
+    <string name="sys_msg_connecting">Connecting to %1$s...</string>
+    <string name="sys_msg_error">Connection error: %1$s</string>
+    <string name="sys_msg_cleared">Chat history cleared</string>
+    <string name="sys_msg_ping_sent">Ping sent to server</string>
+    <string name="sys_msg_pong_received">Pong received from server!</string>
+
+    <string name="msg_copied">Message text copied to clipboard</string>
+</resources>

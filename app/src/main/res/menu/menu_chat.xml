@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_ping"
+        android:icon="@drawable/ic_echo"
+        android:title="@string/menu_ping"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_reconnect"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/menu_reconnect"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_server_config"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/menu_server_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_clear_chat"
+        android:icon="@drawable/ic_clear"
+        android:title="@string/menu_clear_chat"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand / Primary -->
+    <color name="primary_600">#4F46E5</color>
+    <color name="primary_700">#4338CA</color>
+    <color name="primary_100">#E0E7FF</color>
+    <color name="primary_50">#EEF2FF</color>
+
+    <!-- Chat Bubbles -->
+    <color name="bubble_sent_bg">#4F46E5</color>
+    <color name="bubble_sent_text">#FFFFFF</color>
+    <color name="bubble_sent_time">#D1D5DB</color>
+
+    <color name="bubble_received_bg">#F3F4F6</color>
+    <color name="bubble_received_text">#1F2937</color>
+    <color name="bubble_received_time">#9CA3AF</color>
+
+    <color name="bubble_system_bg">#E5E7EB</color>
+    <color name="bubble_system_text">#4B5563</color>
+
+    <!-- Status Indicators -->
+    <color name="status_connected_green">#10B981</color>
+    <color name="status_connecting_amber">#F59E0B</color>
+    <color name="status_disconnected_red">#EF4444</color>
+
+    <!-- General UI Colors -->
+    <color name="window_background">#F9FAFB</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="divider_color">#E5E7EB</color>
+
+    <!-- Suggestions / Chips -->
+    <color name="chip_bg">#EDF2F7</color>
+    <color name="chip_text">#374151</color>
+    <color name="chip_border">#CBD5E1</color>
+</resources>
