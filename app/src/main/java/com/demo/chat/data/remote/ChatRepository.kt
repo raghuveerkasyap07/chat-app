@@ -51,6 +51,37 @@ class ChatRepository(
             }
         }
 
+    suspend fun getChatDetails(chatId: String): Result<ChatDto> =
+        withContext(Dispatchers.IO) {
+            try {
+                val token = sessionManager.getAuthToken()
+                    ?: return@withContext Result.failure(Exception("Not authenticated"))
+
+                val request = Request.Builder()
+                    .url("${getBaseUrl()}/api/chats/$chatId")
+                    .addHeader("Authorization", "Bearer $token")
+                    .get()
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val responseBody = response.body?.string()
+
+                if (response.isSuccessful && !responseBody.isNullOrBlank()) {
+                    val chatResponse = gson.fromJson(responseBody, ChatResponseDto::class.java)
+                    val chat = chatResponse.data?.chat
+                    if (chat != null) {
+                        Result.success(chat)
+                    } else {
+                        Result.failure(Exception("Chat not found"))
+                    }
+                } else {
+                    Result.failure(Exception("Failed to fetch chat details"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
     suspend fun createOrGetChat(recipientId: String): Result<ChatDto> =
         withContext(Dispatchers.IO) {
             try {
