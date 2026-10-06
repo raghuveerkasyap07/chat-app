@@ -4,7 +4,8 @@ import java.util.UUID
 
 data class SdkChatMessage(
     val id: String = UUID.randomUUID().toString(),
-    val text: String,
+    val text: String = "",
+    val imageUrl: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     val type: SdkMessageType,
     val status: SdkMessageStatus = SdkMessageStatus.SENT,
@@ -13,4 +14,7 @@ data class SdkChatMessage(
         SdkMessageType.RECEIVED -> "Echo Bot"
         SdkMessageType.SYSTEM -> "System"
     }
-)
+) {
+    val isImage: Boolean
+        get() = !imageUrl.isNullOrBlank()
+}

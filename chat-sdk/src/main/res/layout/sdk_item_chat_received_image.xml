@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start"
+    android:orientation="vertical"
+    android:paddingVertical="4dp">
+
+    <LinearLayout
+        android:id="@+id/layoutReceivedImageBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:background="@drawable/sdk_bg_bubble_received"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/tvSenderName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:textColor="@color/sdk_primary_600"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Echo Bot" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivReceivedImage"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_marginTop="2dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+            tools:src="@drawable/sdk_ic_photo" />
+
+        <TextView
+            android:id="@+id/tvReceivedImageCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingHorizontal="8dp"
+            android:textColor="@color/sdk_bubble_received_text"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Photo caption here" />
+
+        <TextView
+            android:id="@+id/tvReceivedImageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="2dp"
+            android:paddingHorizontal="4dp"
+            android:textColor="@color/sdk_bubble_received_time"
+            android:textSize="11sp"
+            tools:text="14:32" />
+
+    </LinearLayout>
+
+</LinearLayout>
