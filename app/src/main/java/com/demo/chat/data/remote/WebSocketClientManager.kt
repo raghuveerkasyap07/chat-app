@@ -1,7 +1,12 @@
 package com.demo.chat.data.remote
 
 import android.util.Log
+import com.demo.chat.data.local.SessionManager
+import com.demo.chat.data.model.ChatMessage
 import com.demo.chat.data.model.ConnectionState
+import com.demo.chat.data.model.MessageStatus
+import com.demo.chat.data.model.MessageType
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,12 +24,14 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import java.util.concurrent.TimeUnit
 
-class WebSocketClientManager {
+class WebSocketClientManager(
+    private val sessionManager: SessionManager? = null,
+    private val gson: Gson = Gson()
+) {
 
     companion object {
         private const val TAG = "WebSocketClientManager"
         const val DEFAULT_ECHO_URL = "wss://ws.postman-echo.com/raw"
-        const val BACKUP_ECHO_URL = "wss://echo.websocket.org"
         private const val NORMAL_CLOSURE_STATUS = 1000
     }
 
@@ -40,8 +47,8 @@ class WebSocketClientManager {
     private val _connectionState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected)
     val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
 
-    private val _incomingMessages = MutableSharedFlow<String>(extraBufferCapacity = 64)
-    val incomingMessages: SharedFlow<String> = _incomingMessages.asSharedFlow()
+    private val _incomingMessages = MutableSharedFlow<ChatMessage>(extraBufferCapacity = 64)
+    val incomingMessages: SharedFlow<ChatMessage> = _incomingMessages.asSharedFlow()
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -54,10 +61,16 @@ class WebSocketClientManager {
         _connectionState.value = ConnectionState.Connecting
         Log.d(TAG, "Connecting to WebSocket URL: $currentUrl")
 
+        val token = sessionManager?.getAuthToken()
+        val requestBuilder = Request.Builder()
+            .url(if (!token.isNullOrBlank()) "$currentUrl?token=$token" else currentUrl)
+
+        if (!token.isNullOrBlank()) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+
         val request = try {
-            Request.Builder()
-                .url(currentUrl)
-                .build()
+            requestBuilder.build()
         } catch (e: Exception) {
             Log.e(TAG, "Invalid URL format: $currentUrl", e)
             _connectionState.value = ConnectionState.Error("Invalid URL: ${e.message}")
@@ -67,11 +80,21 @@ class WebSocketClientManager {
         webSocket = client.newWebSocket(request, createWebSocketListener())
     }
 
-    fun sendMessage(text: String): Boolean {
+    fun joinChatRoom(chatId: String) {
+        val payload = mapOf("action" to "join_chat", "chatId" to chatId)
+        webSocket?.send(gson.toJson(payload))
+    }
+
+    fun sendMessage(text: String, chatId: String? = null): Boolean {
         val socket = webSocket
         if (socket != null && _connectionState.value is ConnectionState.Connected) {
-            val sent = socket.send(text)
-            Log.d(TAG, "Sending message: $text (success=$sent)")
+            val payload = if (chatId != null) {
+                gson.toJson(mapOf("chatId" to chatId, "message" to text))
+            } else {
+                text
+            }
+            val sent = socket.send(payload)
+            Log.d(TAG, "Sending message: $payload (success=$sent)")
             return sent
         } else {
             Log.w(TAG, "Cannot send message: WebSocket not connected")
@@ -113,7 +136,8 @@ class WebSocketClientManager {
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.d(TAG, "WebSocket Received text message: $text")
                 scope.launch {
-                    _incomingMessages.emit(text)
+                    val msg = SdkMessageParser.parseIncomingText(text)
+                    _incomingMessages.emit(msg)
                 }
             }
 
@@ -121,7 +145,8 @@ class WebSocketClientManager {
                 val utf8Text = bytes.utf8()
                 Log.d(TAG, "WebSocket Received byte message: $utf8Text")
                 scope.launch {
-                    _incomingMessages.emit(utf8Text)
+                    val msg = SdkMessageParser.parseIncomingText(utf8Text)
+                    _incomingMessages.emit(msg)
                 }
             }
 
@@ -139,6 +164,24 @@ class WebSocketClientManager {
                 Log.e(TAG, "WebSocket Failure: ${t.message}", t)
                 val errorMessage = t.message ?: "Connection failed"
                 _connectionState.value = ConnectionState.Error(errorMessage)
+            }
+        }
+    }
+
+    private object SdkMessageParser {
+        fun parseIncomingText(rawText: String): ChatMessage {
+            return if (rawText == "PING_TEST") {
+                ChatMessage(
+                    text = "Pong response received from Echo Server! 🏓",
+                    type = MessageType.SYSTEM
+                )
+            } else {
+                ChatMessage(
+                    text = rawText,
+                    type = MessageType.RECEIVED,
+                    status = MessageStatus.SENT,
+                    sender = "Echo Bot"
+                )
             }
         }
     }
