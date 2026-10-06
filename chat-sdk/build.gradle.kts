@@ -1,20 +1,17 @@
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.library")
     alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.demo.chat"
+    namespace = "com.demo.chat.sdk"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.demo.chat"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -42,8 +39,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":chat-sdk"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -52,8 +47,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.ktx)
 
+    // Networking / WebSocket
     implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
     implementation(libs.gson)
 }
