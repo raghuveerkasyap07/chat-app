@@ -27,9 +27,11 @@ class ChatClient internal constructor(
     companion object {
         private const val TAG = "ChatClientSDK"
         private const val NORMAL_CLOSURE_STATUS = 1000
+        const val FALLBACK_ECHO_URL = "wss://ws.postman-echo.com/raw"
     }
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
         .pingInterval(15, TimeUnit.SECONDS)
@@ -37,6 +39,7 @@ class ChatClient internal constructor(
 
     private var webSocket: WebSocket? = null
     private var currentUrl: String = defaultUrl
+    private var hasTriedFallback = false
 
     private val _connectionState = MutableStateFlow<SdkConnectionState>(SdkConnectionState.Disconnected)
     val connectionState: StateFlow<SdkConnectionState> = _connectionState.asStateFlow()
@@ -60,7 +63,11 @@ class ChatClient internal constructor(
     }
 
     fun connect(url: String = currentUrl) {
+        if (url != currentUrl) {
+            hasTriedFallback = false
+        }
         currentUrl = url
+
         if (_connectionState.value is SdkConnectionState.Connected || _connectionState.value is SdkConnectionState.Connecting) {
             disconnect()
         }
@@ -109,8 +116,9 @@ class ChatClient internal constructor(
     }
 
     fun reconnect() {
+        hasTriedFallback = false
         disconnect()
-        connect(currentUrl)
+        connect(defaultUrl)
     }
 
     fun getCurrentUrl(): String = currentUrl
@@ -134,7 +142,7 @@ class ChatClient internal constructor(
     private fun createWebSocketListener(): WebSocketListener {
         return object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.i(TAG, "WebSocket connection opened!")
+                Log.i(TAG, "WebSocket connection opened on $currentUrl!")
                 _connectionState.value = SdkConnectionState.Connected
             }
 
@@ -162,8 +170,14 @@ class ChatClient internal constructor(
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e(TAG, "WebSocket Failure: ${t.message}", t)
-                _connectionState.value = SdkConnectionState.Error(t.message ?: "Connection failed")
+                Log.e(TAG, "WebSocket Failure on $currentUrl: ${t.message}", t)
+                if (!hasTriedFallback && currentUrl != FALLBACK_ECHO_URL) {
+                    hasTriedFallback = true
+                    Log.i(TAG, "Switching to fallback public echo server: $FALLBACK_ECHO_URL")
+                    connect(FALLBACK_ECHO_URL)
+                } else {
+                    _connectionState.value = SdkConnectionState.Error(t.message ?: "Connection failed")
+                }
             }
         }
     }

@@ -36,13 +36,15 @@ class WebSocketClientManager(
     }
 
     private val client: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
         .pingInterval(15, TimeUnit.SECONDS)
         .build()
 
     private var webSocket: WebSocket? = null
-    private var currentUrl: String = DEFAULT_ECHO_URL
+    private var currentUrl: String = sessionManager?.getWsUrl() ?: DEFAULT_ECHO_URL
+    private var hasTriedFallback = false
 
     private val _connectionState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected)
     val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
@@ -53,7 +55,11 @@ class WebSocketClientManager(
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun connect(url: String = currentUrl) {
+        if (url != currentUrl) {
+            hasTriedFallback = false
+        }
         currentUrl = url
+
         if (_connectionState.value is ConnectionState.Connected || _connectionState.value is ConnectionState.Connecting) {
             disconnect()
         }
@@ -120,8 +126,9 @@ class WebSocketClientManager(
     }
 
     fun reconnect() {
+        hasTriedFallback = false
         disconnect()
-        connect(currentUrl)
+        connect(sessionManager?.getWsUrl() ?: DEFAULT_ECHO_URL)
     }
 
     fun getCurrentUrl(): String = currentUrl
@@ -129,7 +136,7 @@ class WebSocketClientManager(
     private fun createWebSocketListener(): WebSocketListener {
         return object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.i(TAG, "WebSocket Opened successfully!")
+                Log.i(TAG, "WebSocket Opened successfully on $currentUrl!")
                 _connectionState.value = ConnectionState.Connected
             }
 
@@ -161,9 +168,15 @@ class WebSocketClientManager(
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e(TAG, "WebSocket Failure: ${t.message}", t)
-                val errorMessage = t.message ?: "Connection failed"
-                _connectionState.value = ConnectionState.Error(errorMessage)
+                Log.e(TAG, "WebSocket Failure on $currentUrl: ${t.message}", t)
+                if (!hasTriedFallback && currentUrl != DEFAULT_ECHO_URL) {
+                    hasTriedFallback = true
+                    Log.i(TAG, "Switching to fallback public echo server: $DEFAULT_ECHO_URL")
+                    connect(DEFAULT_ECHO_URL)
+                } else {
+                    val errorMessage = t.message ?: "Connection failed"
+                    _connectionState.value = ConnectionState.Error(errorMessage)
+                }
             }
         }
     }
