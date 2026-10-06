@@ -6,9 +6,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
+import coil.load
 import com.demo.chat.sdk.ChatEngine
 import com.demo.chat.sdk.R
 import com.demo.chat.sdk.core.ChatClient
@@ -17,6 +20,7 @@ import com.demo.chat.sdk.core.model.SdkConnectionState
 import com.demo.chat.sdk.core.model.SdkMessageStatus
 import com.demo.chat.sdk.core.model.SdkMessageType
 import com.demo.chat.sdk.databinding.SdkChatViewBinding
+import com.demo.chat.sdk.databinding.SdkDialogImagePreviewBinding
 import com.demo.chat.sdk.ui.adapter.SdkChatAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,14 +36,16 @@ class ChatView @JvmOverloads constructor(
     private val binding: SdkChatViewBinding =
         SdkChatViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private val chatAdapter = SdkChatAdapter { message ->
-        copyToClipboard(message.text)
-    }
+    private val chatAdapter = SdkChatAdapter(
+        onMessageLongClick = { message -> copyToClipboard(message.text) },
+        onImageClick = { imageUrl -> showImagePreviewDialog(imageUrl) }
+    )
 
     private var chatClient: ChatClient? = null
     private val messages = mutableListOf<SdkChatMessage>()
-
     private val viewScope = CoroutineScope(Dispatchers.Main + Job())
+
+    var onAttachmentClickListener: (() -> Unit)? = null
 
     init {
         setupAttrs(attrs, defStyleAttr)
@@ -72,6 +78,10 @@ class ChatView @JvmOverloads constructor(
     }
 
     private fun setupInputAndChips() {
+        binding.btnSdkAttach.setOnClickListener {
+            onAttachmentClickListener?.invoke()
+        }
+
         binding.etSdkMessage.addTextChangedListener { text ->
             val hasText = !text.isNullOrBlank()
             val isConnected = chatClient?.connectionState?.value is SdkConnectionState.Connected
@@ -125,6 +135,13 @@ class ChatView @JvmOverloads constructor(
                 client.incomingMessages.collect { text ->
                     if (text == "PING_TEST") {
                         addSystemMessage("Pong response received via SDK! 🏓")
+                    } else if (text.startsWith("http://") || text.startsWith("https://") || text.startsWith("content://")) {
+                        val imgMsg = SdkChatMessage(
+                            imageUrl = text,
+                            type = SdkMessageType.RECEIVED,
+                            sender = "Echo Bot"
+                        )
+                        addMessage(imgMsg)
                     } else {
                         val msg = SdkChatMessage(
                             text = text,
@@ -152,6 +169,23 @@ class ChatView @JvmOverloads constructor(
         addMessage(message)
 
         val isSent = client.sendMessage(trimmed)
+        val updatedStatus = if (isSent) SdkMessageStatus.SENT else SdkMessageStatus.FAILED
+        updateMessageStatus(message.id, updatedStatus)
+    }
+
+    fun sendImageMessage(imageUrl: String, caption: String = "") {
+        val client = chatClient ?: return
+
+        val message = SdkChatMessage(
+            text = caption,
+            imageUrl = imageUrl,
+            type = SdkMessageType.SENT,
+            status = SdkMessageStatus.SENDING
+        )
+
+        addMessage(message)
+
+        val isSent = client.sendMessage(imageUrl)
         val updatedStatus = if (isSent) SdkMessageStatus.SENT else SdkMessageStatus.FAILED
         updateMessageStatus(message.id, updatedStatus)
     }
@@ -211,7 +245,24 @@ class ChatView @JvmOverloads constructor(
         }
     }
 
+    private fun showImagePreviewDialog(imageUrl: String) {
+        val dialogBinding = SdkDialogImagePreviewBinding.inflate(LayoutInflater.from(context))
+        dialogBinding.ivFullImage.load(imageUrl) {
+            crossfade(true)
+            placeholder(R.drawable.sdk_ic_photo)
+            error(R.drawable.sdk_ic_error)
+        }
+
+        val dialog = AlertDialog.Builder(context, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.root.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
     private fun copyToClipboard(text: String) {
+        if (text.isBlank()) return
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("SDK Chat Message", text)
         clipboard.setPrimaryClip(clip)
