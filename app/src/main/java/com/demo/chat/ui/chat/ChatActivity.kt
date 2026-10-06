@@ -40,8 +40,9 @@ class ChatActivity : AppCompatActivity() {
             serverUrl = ChatEngine.DEFAULT_SERVER_URL
         )
 
-        // 2. Setup the Chat UI View with the Engine
+        // 2. Setup the Chat UI View with the Engine & Header Title
         binding.chatView.setupWithEngine(chatEngine)
+        binding.chatView.setHeaderTitle(peerName)
 
         // 3. Attach Photo Picker Click Listener
         binding.chatView.onAttachmentClickListener = {
