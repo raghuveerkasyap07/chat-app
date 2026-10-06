@@ -20,6 +20,7 @@
     <string name="menu_clear_chat">Clear Chat</string>
     <string name="menu_reconnect">Reconnect</string>
     <string name="menu_ping">Send Ping</string>
+    <string name="menu_test_notification">Test Local Notification</string>
 
     <string name="dialog_server_title">WebSocket Server Configuration</string>
     <string name="dialog_server_hint">WebSocket URL (e.g., wss://ws.postman-echo.com/raw)</string>
