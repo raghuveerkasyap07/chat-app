@@ -57,4 +57,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.coil)
+    implementation(libs.socketio)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
 }
