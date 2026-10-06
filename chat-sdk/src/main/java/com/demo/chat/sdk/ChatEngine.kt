@@ -8,7 +8,8 @@ class ChatEngine private constructor(
     val client: ChatClient
 ) {
     companion object {
-        const val DEFAULT_SERVER_URL = "wss://ws.postman-echo.com/raw"
+        const val DEFAULT_SERVER_URL = "ws://192.168.0.10:5000"
+        const val FALLBACK_ECHO_URL = "wss://ws.postman-echo.com/raw"
 
         @Volatile
         private var INSTANCE: ChatEngine? = null
