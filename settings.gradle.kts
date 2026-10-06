@@ -29,3 +29,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "chat-app"
 include(":app")
+include(":chatsdk")
