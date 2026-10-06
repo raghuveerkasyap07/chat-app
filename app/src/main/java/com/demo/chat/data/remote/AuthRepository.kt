@@ -12,13 +12,14 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class AuthRepository(
-    private val baseUrl: String = "http://10.0.2.2:5000",
     private val sessionManager: SessionManager,
     private val client: OkHttpClient = OkHttpClient(),
     private val gson: Gson = Gson()
 ) {
 
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+
+    private fun getBaseUrl(): String = sessionManager.getBaseUrl()
 
     suspend fun register(name: String, email: String, password: String): Result<UserDto> =
         withContext(Dispatchers.IO) {
@@ -27,7 +28,7 @@ class AuthRepository(
                     mapOf("name" to name, "email" to email, "password" to password)
                 )
                 val request = Request.Builder()
-                    .url("$baseUrl/api/auth/register")
+                    .url("${getBaseUrl()}/api/auth/register")
                     .post(jsonBody.toRequestBody(jsonMediaType))
                     .build()
 
@@ -59,7 +60,7 @@ class AuthRepository(
                     mapOf("email" to email, "password" to password)
                 )
                 val request = Request.Builder()
-                    .url("$baseUrl/api/auth/login")
+                    .url("${getBaseUrl()}/api/auth/login")
                     .post(jsonBody.toRequestBody(jsonMediaType))
                     .build()
 
@@ -91,7 +92,7 @@ class AuthRepository(
                     ?: return@withContext Result.failure(Exception("No auth token"))
 
                 val request = Request.Builder()
-                    .url("$baseUrl/api/auth/me")
+                    .url("${getBaseUrl()}/api/auth/me")
                     .addHeader("Authorization", "Bearer $token")
                     .get()
                     .build()

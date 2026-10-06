@@ -16,13 +16,14 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ChatRepository(
-    private val baseUrl: String = "http://10.0.2.2:5000",
     private val sessionManager: SessionManager,
     private val client: OkHttpClient = OkHttpClient(),
     private val gson: Gson = Gson()
 ) {
 
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+
+    private fun getBaseUrl(): String = sessionManager.getBaseUrl()
 
     suspend fun getChats(): Result<List<ChatDto>> =
         withContext(Dispatchers.IO) {
@@ -31,7 +32,7 @@ class ChatRepository(
                     ?: return@withContext Result.failure(Exception("Not authenticated"))
 
                 val request = Request.Builder()
-                    .url("$baseUrl/api/chats")
+                    .url("${getBaseUrl()}/api/chats")
                     .addHeader("Authorization", "Bearer $token")
                     .get()
                     .build()
@@ -58,7 +59,7 @@ class ChatRepository(
 
                 val jsonBody = gson.toJson(mapOf("recipientId" to recipientId))
                 val request = Request.Builder()
-                    .url("$baseUrl/api/chats")
+                    .url("${getBaseUrl()}/api/chats")
                     .addHeader("Authorization", "Bearer $token")
                     .post(jsonBody.toRequestBody(jsonMediaType))
                     .build()
@@ -89,7 +90,7 @@ class ChatRepository(
                     ?: return@withContext Result.failure(Exception("Not authenticated"))
 
                 val request = Request.Builder()
-                    .url("$baseUrl/api/chats/$chatId/messages?page=$page&limit=$limit")
+                    .url("${getBaseUrl()}/api/chats/$chatId/messages?page=$page&limit=$limit")
                     .addHeader("Authorization", "Bearer $token")
                     .get()
                     .build()
@@ -116,7 +117,7 @@ class ChatRepository(
 
                 val jsonBody = gson.toJson(mapOf("message" to text))
                 val request = Request.Builder()
-                    .url("$baseUrl/api/chats/$chatId/messages")
+                    .url("${getBaseUrl()}/api/chats/$chatId/messages")
                     .addHeader("Authorization", "Bearer $token")
                     .post(jsonBody.toRequestBody(jsonMediaType))
                     .build()

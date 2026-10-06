@@ -13,13 +13,14 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 class MediaRepository(
-    private val baseUrl: String = "http://10.0.2.2:5000",
     private val sessionManager: SessionManager,
     private val client: OkHttpClient = OkHttpClient(),
     private val gson: Gson = Gson()
 ) {
 
     private val imageMediaType = "image/jpeg".toMediaType()
+
+    private fun getBaseUrl(): String = sessionManager.getBaseUrl()
 
     suspend fun uploadPhotoAttachment(chatId: String, photoFile: File): Result<String> =
         withContext(Dispatchers.IO) {
@@ -34,7 +35,7 @@ class MediaRepository(
                     .build()
 
                 val request = Request.Builder()
-                    .url("$baseUrl/api/chats/$chatId/attachments")
+                    .url("${getBaseUrl()}/api/chats/$chatId/attachments")
                     .addHeader("Authorization", "Bearer $token")
                     .post(multipartBody)
                     .build()
