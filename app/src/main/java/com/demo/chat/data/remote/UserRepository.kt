@@ -10,11 +10,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class UserRepository(
-    private val baseUrl: String = "http://10.0.2.2:5000",
     private val sessionManager: SessionManager,
     private val client: OkHttpClient = OkHttpClient(),
     private val gson: Gson = Gson()
 ) {
+
+    private fun getBaseUrl(): String = sessionManager.getBaseUrl()
 
     suspend fun getUsers(search: String? = null): Result<List<UserDto>> =
         withContext(Dispatchers.IO) {
@@ -24,7 +25,7 @@ class UserRepository(
 
                 val query = if (!search.isNullOrBlank()) "?search=$search" else ""
                 val request = Request.Builder()
-                    .url("$baseUrl/api/users$query")
+                    .url("${getBaseUrl()}/api/users$query")
                     .addHeader("Authorization", "Bearer $token")
                     .get()
                     .build()
@@ -50,7 +51,7 @@ class UserRepository(
                     ?: return@withContext Result.failure(Exception("Not authenticated"))
 
                 val request = Request.Builder()
-                    .url("$baseUrl/api/users/$userId")
+                    .url("${getBaseUrl()}/api/users/$userId")
                     .addHeader("Authorization", "Bearer $token")
                     .get()
                     .build()
