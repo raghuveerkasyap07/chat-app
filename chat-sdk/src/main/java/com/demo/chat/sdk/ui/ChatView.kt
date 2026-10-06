@@ -3,10 +3,10 @@ package com.demo.chat.sdk.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -57,13 +57,19 @@ class ChatView @JvmOverloads constructor(
         }
     }
 
+    fun setHeaderTitle(title: String) {
+        if (title.isNotBlank()) {
+            binding.tvSdkHeaderTitle.text = title
+        }
+    }
+
     private fun setupAttrs(attrs: AttributeSet?, defStyleAttr: Int) {
         if (attrs == null) return
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ChatView, defStyleAttr, 0)
         try {
             val title = typedArray.getString(R.styleable.ChatView_titleText)
             if (!title.isNullOrBlank()) {
-                binding.tvSdkHeaderTitle.text = title
+                setHeaderTitle(title)
             }
 
             val showSuggestions = typedArray.getBoolean(R.styleable.ChatView_showSuggestions, true)
@@ -242,6 +248,15 @@ class ChatView @JvmOverloads constructor(
                 binding.tvSdkStatusText.text = context.getString(R.string.sdk_status_disconnected)
                 addSystemMessage("Connection Error: ${state.message}")
             }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.layoutSdkHeader.setPadding(32, 16, 32, 16)
+        } else {
+            binding.layoutSdkHeader.setPadding(32, 24, 32, 24)
         }
     }
 
