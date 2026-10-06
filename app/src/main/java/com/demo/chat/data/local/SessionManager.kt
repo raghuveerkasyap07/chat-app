@@ -8,14 +8,11 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREF_NAME = "demo_chat_session"
 
-        // Default Server Hosts:
-        // 192.168.0.6:5000 for Physical Phone on Wi-Fi
-        // 10.0.2.2:5000 for Android Emulator
-        const val HOST_WIFI = "192.168.0.6:5000"
-        const val HOST_EMULATOR = "10.0.2.2:5000"
+        // Primary Running Server IP (Text Chat Backend API):
+        const val HOST_SERVER = "192.168.0.10:5000"
 
-        const val DEFAULT_BASE_URL = "http://$HOST_WIFI"
-        const val DEFAULT_WS_URL = "ws://$HOST_WIFI"
+        const val DEFAULT_BASE_URL = "http://$HOST_SERVER"
+        const val DEFAULT_WS_URL = "ws://$HOST_SERVER"
         const val PUBLIC_ECHO_URL = "wss://ws.postman-echo.com/raw"
 
         private const val KEY_BASE_URL = "key_base_url"
