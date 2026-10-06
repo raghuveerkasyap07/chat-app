@@ -42,6 +42,7 @@ class ChatView @JvmOverloads constructor(
     )
 
     private var chatClient: ChatClient? = null
+    private var peerName: String = "Partner"
     private val messages = mutableListOf<SdkChatMessage>()
     private val viewScope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -59,6 +60,7 @@ class ChatView @JvmOverloads constructor(
 
     fun setHeaderTitle(title: String) {
         if (title.isNotBlank()) {
+            peerName = title
             binding.tvSdkHeaderTitle.text = title
         }
     }
@@ -119,7 +121,7 @@ class ChatView @JvmOverloads constructor(
         }
 
         binding.chipHowAreYou.setOnClickListener {
-            sendMessage("❓ How are you, WebSocket Echo Server?")
+            sendMessage("❓ How are you?")
         }
     }
 
@@ -145,14 +147,14 @@ class ChatView @JvmOverloads constructor(
                         val imgMsg = SdkChatMessage(
                             imageUrl = text,
                             type = SdkMessageType.RECEIVED,
-                            sender = "Echo Bot"
+                            sender = peerName
                         )
                         addMessage(imgMsg)
                     } else {
                         val msg = SdkChatMessage(
                             text = text,
                             type = SdkMessageType.RECEIVED,
-                            sender = "Echo Bot"
+                            sender = peerName
                         )
                         addMessage(msg)
                     }
@@ -233,7 +235,7 @@ class ChatView @JvmOverloads constructor(
             is SdkConnectionState.Connected -> {
                 binding.viewSdkStatusDot.setBackgroundResource(R.drawable.sdk_bg_status_dot_connected)
                 binding.tvSdkStatusText.text = context.getString(R.string.sdk_status_connected)
-                addSystemMessage("Connected to WebSocket Server (${chatClient?.getCurrentUrl()})")
+                addSystemMessage("Connected to 1-on-1 WebSocket Server (${chatClient?.getCurrentUrl()})")
             }
             is SdkConnectionState.Connecting -> {
                 binding.viewSdkStatusDot.setBackgroundResource(R.drawable.sdk_bg_status_dot_connecting)
