@@ -143,7 +143,7 @@ class WebSocketClientManager(
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.d(TAG, "WebSocket Received text message: $text")
                 scope.launch {
-                    val msg = SdkMessageParser.parseIncomingText(text)
+                    val msg = parseIncomingText(text)
                     _incomingMessages.emit(msg)
                 }
             }
@@ -152,7 +152,7 @@ class WebSocketClientManager(
                 val utf8Text = bytes.utf8()
                 Log.d(TAG, "WebSocket Received byte message: $utf8Text")
                 scope.launch {
-                    val msg = SdkMessageParser.parseIncomingText(utf8Text)
+                    val msg = parseIncomingText(utf8Text)
                     _incomingMessages.emit(msg)
                 }
             }
@@ -181,21 +181,44 @@ class WebSocketClientManager(
         }
     }
 
-    private object SdkMessageParser {
-        fun parseIncomingText(rawText: String): ChatMessage {
-            return if (rawText == "PING_TEST") {
-                ChatMessage(
-                    text = "Pong response received from Echo Server! 🏓",
-                    type = MessageType.SYSTEM
-                )
+    private fun parseIncomingText(rawText: String): ChatMessage {
+        if (rawText == "PING_TEST") {
+            return ChatMessage(
+                text = "Pong response received from Server! 🏓",
+                type = MessageType.SYSTEM
+            )
+        }
+
+        return try {
+            val jsonObject = gson.fromJson(rawText, Map::class.java) as? Map<*, *>
+            val senderId = jsonObject?.get("senderId")?.toString() ?: ""
+            val senderName = jsonObject?.get("senderName")?.toString()
+                ?: jsonObject?.get("sender")?.toString()
+                ?: "Partner"
+            val text = jsonObject?.get("message")?.toString()
+                ?: jsonObject?.get("text")?.toString()
+                ?: rawText
+
+            val currentUserId = sessionManager?.getUserId() ?: ""
+            val messageType = if (senderId.isNotBlank() && senderId == currentUserId) {
+                MessageType.SENT
             } else {
-                ChatMessage(
-                    text = rawText,
-                    type = MessageType.RECEIVED,
-                    status = MessageStatus.SENT,
-                    sender = "Echo Bot"
-                )
+                MessageType.RECEIVED
             }
+
+            ChatMessage(
+                text = text,
+                type = messageType,
+                status = MessageStatus.SENT,
+                sender = if (messageType == MessageType.SENT) "You" else senderName
+            )
+        } catch (e: Exception) {
+            ChatMessage(
+                text = rawText,
+                type = MessageType.RECEIVED,
+                status = MessageStatus.SENT,
+                sender = "Partner"
+            )
         }
     }
 }
