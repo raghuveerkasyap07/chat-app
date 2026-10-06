@@ -1,15 +1,22 @@
 package com.demo.chat.ui.chat
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +25,7 @@ import com.demo.chat.DemoChatApplication
 import com.demo.chat.R
 import com.demo.chat.data.model.ChatMessage
 import com.demo.chat.data.model.ConnectionState
+import com.demo.chat.data.model.MessageType
 import com.demo.chat.databinding.ActivityChatBinding
 import com.demo.chat.databinding.DialogServerConfigBinding
 import com.demo.chat.ui.chat.adapter.ChatAdapter
@@ -34,6 +42,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var chatAdapter: ChatAdapter
     private var peerName: String = "Echo Bot"
     private var threadId: String = "thread_echo_bot"
+    private var lastNotifiedMessageId: String? = null
 
     private val viewModel: ChatViewModel by viewModels {
         val app = application as DemoChatApplication
@@ -112,6 +121,16 @@ class ChatActivity : AppCompatActivity() {
                                 binding.rvChatMessages.smoothScrollToPosition(messages.size - 1)
                             }
                         }
+
+                        // Trigger notification for incoming received messages
+                        val lastMessage = messages.lastOrNull()
+                        if (lastMessage != null &&
+                            lastMessage.type == MessageType.RECEIVED &&
+                            lastMessage.id != lastNotifiedMessageId
+                        ) {
+                            lastNotifiedMessageId = lastMessage.id
+                            showIncomingMessageNotification(lastMessage.sender, lastMessage.text)
+                        }
                     }
                 }
 
@@ -121,6 +140,47 @@ class ChatActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun showIncomingMessageNotification(sender: String, text: String) {
+        val channelId = "chat_notifications_channel"
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val name = "Chat Notifications"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, name, importance)
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val intent = Intent(this, ChatActivity::class.java).apply {
+            putExtra(EXTRA_THREAD_ID, threadId)
+            putExtra(EXTRA_PEER_NAME, peerName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            threadId.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_websocket)
+            .setContentTitle("New message from $sender")
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+
+        try {
+            with(NotificationManagerCompat.from(this)) {
+                notify(text.hashCode(), builder.build())
+            }
+        } catch (_: SecurityException) {
+            // Permission not granted
         }
     }
 
@@ -175,6 +235,73 @@ class ChatActivity : AppCompatActivity() {
             .show()
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showTestNotification()
+        } else {
+            Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkAndShowTestNotification() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                showTestNotification()
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            showTestNotification()
+        }
+    }
+
+    private fun showTestNotification() {
+        val channelId = "chat_notifications_channel"
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val name = "Chat Notifications"
+            val importance = android.app.NotificationManager.IMPORTANCE_HIGH
+            val channel = android.app.NotificationChannel(channelId, name, importance)
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val intent = Intent(this, ChatActivity::class.java).apply {
+            putExtra(EXTRA_THREAD_ID, threadId)
+            putExtra(EXTRA_PEER_NAME, peerName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            this,
+            threadId.hashCode(),
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = androidx.core.app.NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_websocket)
+            .setContentTitle("New message from $peerName")
+            .setContentText("Local test notification: Tap to open chat!")
+            .setAutoCancel(true)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+
+        try {
+            with(androidx.core.app.NotificationManagerCompat.from(this)) {
+                notify(2002, builder.build())
+            }
+            Toast.makeText(this, "Local notification sent!", Toast.LENGTH_SHORT).show()
+        } catch (_: SecurityException) {
+            Toast.makeText(this, "Notification permission required", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_chat, menu)
         return true
@@ -196,6 +323,10 @@ class ChatActivity : AppCompatActivity() {
             }
             R.id.action_clear_chat -> {
                 viewModel.clearChat()
+                true
+            }
+            R.id.action_test_notification -> {
+                checkAndShowTestNotification()
                 true
             }
             else -> super.onOptionsItemSelected(item)

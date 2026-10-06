@@ -25,4 +25,9 @@
         android:icon="@drawable/ic_clear"
         android:title="@string/menu_clear_chat"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_test_notification"
+        android:title="@string/menu_test_notification"
+        app:showAsAction="never" />
 </menu>
