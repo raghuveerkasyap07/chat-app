@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:orientation="vertical"
+    android:paddingVertical="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:background="@drawable/bg_bubble_sent"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/ivSentImage"
+            android:layout_width="220dp"
+            android:layout_height="200dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Sent Image"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_photo" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvSentImageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:textColor="@color/bubble_sent_time"
+                android:textSize="11sp"
+                tools:text="14:32" />
+
+            <ImageView
+                android:id="@+id/ivSentImageStatus"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="Status"
+                android:src="@drawable/ic_check" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

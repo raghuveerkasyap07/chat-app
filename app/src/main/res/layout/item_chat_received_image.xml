@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start"
+    android:orientation="vertical"
+    android:paddingVertical="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/bg_bubble_received"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <TextView
+            android:id="@+id/tvReceivedImageSender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/primary_600"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Echo Bot" />
+
+        <ImageView
+            android:id="@+id/ivReceivedImage"
+            android:layout_width="220dp"
+            android:layout_height="200dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Received Image"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_photo" />
+
+        <TextView
+            android:id="@+id/tvReceivedImageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:textColor="@color/bubble_received_time"
+            android:textSize="11sp"
+            tools:text="14:32" />
+
+    </LinearLayout>
+
+</LinearLayout>

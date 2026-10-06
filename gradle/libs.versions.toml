@@ -11,6 +11,7 @@ activityKtx = "1.9.2"
 okhttp = "4.12.0"
 gson = "2.10.1"
 firebaseBom = "33.5.0"
+coil = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +28,7 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

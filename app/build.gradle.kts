@@ -56,6 +56,7 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.coil)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
 }
