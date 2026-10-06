@@ -96,17 +96,8 @@ class ChatViewModel(
 
     private fun observeIncomingMessages() {
         viewModelScope.launch {
-            webSocketManager.incomingMessages.collect { text ->
-                if (text == "PING_TEST") {
-                    addSystemMessage("Pong response received from Echo Server! 🏓")
-                } else {
-                    val receivedMessage = ChatMessage(
-                        text = text,
-                        type = MessageType.RECEIVED,
-                        sender = "Echo Bot"
-                    )
-                    addMessage(receivedMessage)
-                }
+            webSocketManager.incomingMessages.collect { incomingMessage ->
+                addMessage(incomingMessage)
             }
         }
     }
