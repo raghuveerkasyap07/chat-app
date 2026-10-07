@@ -10,6 +10,9 @@ lifecycle = "2.8.6"
 activityKtx = "1.9.2"
 okhttp = "4.12.0"
 gson = "2.10.1"
+coil = "2.7.0"
+socketIo = "2.1.1"
+retrofit = "2.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,6 +27,10 @@ androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", ve
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+socketio = { group = "io.socket", name = "socket.io-client", version.ref = "socketIo" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

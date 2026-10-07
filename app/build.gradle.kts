@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":chat-sdk"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -52,8 +54,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.ktx)
 
-    // Networking / WebSocket
     implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
     implementation(libs.gson)
+    implementation(libs.coil)
+    implementation(libs.socketio)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
 }

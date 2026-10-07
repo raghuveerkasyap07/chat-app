@@ -1,0 +1,30 @@
+<resources>
+    <string name="sdk_app_name">Chat SDK</string>
+    <string name="sdk_title_chat">WebSocket Chat SDK</string>
+
+    <string name="sdk_status_connected">Connected</string>
+    <string name="sdk_status_connecting">Connecting...</string>
+    <string name="sdk_status_disconnected">Disconnected</string>
+
+    <string name="sdk_type_a_message">Type a message...</string>
+    <string name="sdk_send">Send</string>
+    <string name="sdk_echo_bot">Echo Bot</string>
+    <string name="sdk_you">You</string>
+
+    <string name="sdk_menu_server_settings">Server Config</string>
+    <string name="sdk_menu_clear_chat">Clear Chat</string>
+    <string name="sdk_menu_reconnect">Reconnect</string>
+    <string name="sdk_menu_ping">Send Ping</string>
+
+    <string name="sdk_dialog_server_title">WebSocket Server Configuration</string>
+    <string name="sdk_dialog_server_hint">WebSocket URL (wss://...)</string>
+    <string name="sdk_btn_connect">Connect</string>
+    <string name="sdk_btn_cancel">Cancel</string>
+
+    <string name="sdk_suggestion_hello">👋 Hello!</string>
+    <string name="sdk_suggestion_echo">🧪 Test Echo</string>
+    <string name="sdk_suggestion_ping">⏱️ Ping</string>
+    <string name="sdk_suggestion_how_are_you">❓ How are you?</string>
+
+    <string name="sdk_msg_copied">Message copied to clipboard</string>
+</resources>

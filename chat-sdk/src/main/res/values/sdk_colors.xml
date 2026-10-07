@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sdk_primary_600">#4F46E5</color>
+    <color name="sdk_primary_700">#4338CA</color>
+    <color name="sdk_primary_100">#E0E7FF</color>
+
+    <color name="sdk_bubble_sent_bg">#4F46E5</color>
+    <color name="sdk_bubble_sent_text">#FFFFFF</color>
+    <color name="sdk_bubble_sent_time">#D1D5DB</color>
+
+    <color name="sdk_bubble_received_bg">#F3F4F6</color>
+    <color name="sdk_bubble_received_text">#1F2937</color>
+    <color name="sdk_bubble_received_time">#9CA3AF</color>
+
+    <color name="sdk_bubble_system_bg">#E5E7EB</color>
+    <color name="sdk_bubble_system_text">#4B5563</color>
+
+    <color name="sdk_status_connected_green">#10B981</color>
+    <color name="sdk_status_connecting_amber">#F59E0B</color>
+    <color name="sdk_status_disconnected_red">#EF4444</color>
+
+    <color name="sdk_window_background">#F9FAFB</color>
+    <color name="sdk_surface_card">#FFFFFF</color>
+    <color name="sdk_text_primary">#111827</color>
+    <color name="sdk_text_secondary">#6B7280</color>
+    <color name="sdk_divider_color">#E5E7EB</color>
+
+    <color name="sdk_chip_bg">#EDF2F7</color>
+    <color name="sdk_chip_text">#374151</color>
+    <color name="sdk_chip_border">#CBD5E1</color>
+</resources>

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".DemoChatApplication"
@@ -15,8 +16,17 @@
         android:theme="@style/Theme.DemoChat"
         android:usesCleartextTraffic="true">
 
+        <service
+            android:name=".fcm.DemoFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".ui.threads.ThreadListActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,6 +36,7 @@
 
         <activity
             android:name=".ui.chat.ChatActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
