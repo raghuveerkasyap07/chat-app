@@ -37,8 +37,11 @@ class ThreadAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(thread: ChatThread) {
-            binding.tvPeerName.text = thread.peerName
-            binding.tvLastMessage.text = thread.lastMessageText
+            val previewText = when {
+                thread.lastMessageText.startsWith("http") || thread.lastMessageText.contains("[Photo]") -> "📷 Photo"
+                else -> thread.lastMessageText
+            }
+            binding.tvLastMessage.text = previewText
             binding.tvTimestamp.text = timeFormatter.format(Date(thread.lastMessageTimestamp))
 
             // Generate initials

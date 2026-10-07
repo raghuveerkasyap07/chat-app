@@ -16,13 +16,6 @@
         android:theme="@style/Theme.DemoChat"
         android:usesCleartextTraffic="true">
 
-        <service
-            android:name=".fcm.DemoFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
 
         <activity
             android:name=".ui.threads.ThreadListActivity"

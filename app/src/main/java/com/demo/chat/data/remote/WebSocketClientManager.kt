@@ -108,6 +108,27 @@ class WebSocketClientManager(
         }
     }
 
+    fun sendImage(imageUrl: String, chatId: String? = null): Boolean {
+        val socket = webSocket
+        if (socket != null && _connectionState.value is ConnectionState.Connected) {
+            val payload = mapOf(
+                "action" to "send_image",
+                "type" to "IMAGE",
+                "chatId" to (chatId ?: ""),
+                "imageUrl" to imageUrl,
+                "mediaUrl" to imageUrl,
+                "message" to imageUrl
+            )
+            val jsonPayload = gson.toJson(payload)
+            val sent = socket.send(jsonPayload)
+            Log.d(TAG, "Sending image message: $jsonPayload (success=$sent)")
+            return sent
+        } else {
+            Log.w(TAG, "Cannot send image message: WebSocket not connected")
+            return false
+        }
+    }
+
     fun sendPing(): Boolean {
         val socket = webSocket
         if (socket != null && _connectionState.value is ConnectionState.Connected) {
@@ -199,23 +220,37 @@ class WebSocketClientManager(
                 ?: jsonObject?.get("text")?.toString()
                 ?: rawText
 
+            val imageUrl = jsonObject?.get("imageUrl")?.toString()
+                ?: jsonObject?.get("mediaUrl")?.toString()
+                ?: if (rawText.startsWith("http") && (rawText.endsWith(".jpg") || rawText.endsWith(".png") || rawText.endsWith(".jpeg") || rawText.endsWith(".webp"))) rawText else null
+
+            val typeStr = jsonObject?.get("type")?.toString() ?: ""
+            val isImage = !imageUrl.isNullOrBlank() || typeStr == "IMAGE" || typeStr == "TYPE_IMAGE"
+
             val currentUserId = sessionManager?.getUserId() ?: ""
-            val messageType = if (senderId.isNotBlank() && senderId == currentUserId) {
-                MessageType.SENT
-            } else {
-                MessageType.RECEIVED
+            val isSent = senderId.isNotBlank() && senderId == currentUserId
+
+            val messageType = when {
+                isImage && isSent -> MessageType.SENT_IMAGE
+                isImage && !isSent -> MessageType.RECEIVED_IMAGE
+                isSent -> MessageType.SENT_TEXT
+                else -> MessageType.RECEIVED_TEXT
             }
 
             ChatMessage(
-                text = text,
+                text = if (isImage && (text.isBlank() || text == imageUrl)) "[Photo]" else text,
+                imageUrl = imageUrl,
                 type = messageType,
                 status = MessageStatus.SENT,
-                sender = if (messageType == MessageType.SENT) "You" else senderName
+                sender = if (isSent) "You" else senderName
             )
         } catch (e: Exception) {
+            val isUrl = rawText.startsWith("http") || rawText.startsWith("content:")
+            val isImage = isUrl && (rawText.endsWith(".jpg") || rawText.endsWith(".png") || rawText.endsWith(".jpeg") || rawText.endsWith(".webp"))
             ChatMessage(
-                text = rawText,
-                type = MessageType.RECEIVED,
+                text = if (isImage) "[Photo]" else rawText,
+                imageUrl = if (isImage) rawText else null,
+                type = if (isImage) MessageType.RECEIVED_IMAGE else MessageType.RECEIVED_TEXT,
                 status = MessageStatus.SENT,
                 sender = "Partner"
             )
